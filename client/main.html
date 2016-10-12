@@ -3,23 +3,29 @@
 </head>
 
 <body>
-  <h1>Welcome to Meteor!</h1>
+  <nav class="navbar navbar-default navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="#">Text Cirle</a>
+  </div>
+  </nav>
+  <div class="container top-margin">
+    <div class="row">
+      <div class="col-md-6">
+        {{> editor}}
+      </div>
+        {{> viewer}}
+      <div class="col-md-6">
+      </div>
+    </div>
+  </div>
 
-  {{> hello}}
-  {{> info}}
 </body>
 
-<template name="hello">
-  <button>Click Me</button>
-  <p>You've pressed the button {{counter}} times.</p>
+<template name="editor">
+        {{>sharejsCM docid=docid onRender=config id="editor"}}
 </template>
+<template name="viewer">
+    <iframe id="viewer_iframe">
 
-<template name="info">
-  <h2>Learn Meteor!</h2>
-  <ul>
-    <li><a href="https://www.meteor.com/try" target="_blank">Do the Tutorial</a></li>
-    <li><a href="http://guide.meteor.com" target="_blank">Follow the Guide</a></li>
-    <li><a href="https://docs.meteor.com" target="_blank">Read the Docs</a></li>
-    <li><a href="https://forums.meteor.com" target="_blank">Discussions</a></li>
-  </ul>
+    </iframe>
 </template>

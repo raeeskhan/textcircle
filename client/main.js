@@ -1,22 +1,30 @@
 import { Template } from 'meteor/templating';
-import { ReactiveVar } from 'meteor/reactive-var';
-
+//import { Session } from 'meteor/session';
 import './main.html';
 
-Template.hello.onCreated(function helloOnCreated() {
-  // counter starts at 0
-  this.counter = new ReactiveVar(0);
+//Session.set('current_date', 8);
+
+Template.editor.helpers({
+  docid:function(){
+    var doc = Documents.findOne()._id;
+    if(doc) {
+      return doc;
+    }
+    else {
+      return undefined;
+    }
+  },
+  config:function(){
+    return function(editor){
+      editor.on("change", function(cm_editor, info){
+        console.log(cm_editor.getValue());
+        $("#viewer_iframe").contents().find("html").html(cm_editor.getValue());
+      })
+
+    }
+  }
 });
 
-Template.hello.helpers({
-  counter() {
-    return Template.instance().counter.get();
-  },
-});
+Template.editor.events({
 
-Template.hello.events({
-  'click button'(event, instance) {
-    // increment the counter when button is clicked
-    instance.counter.set(instance.counter.get() + 1);
-  },
 });
