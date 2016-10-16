@@ -9,13 +9,8 @@ Accounts.ui.config({
 });
 Template.editor.helpers({
   docid:function(){
-    var doc = Documents.findOne()._id;
-    if(doc) {
-      return doc;
-    }
-    else {
-      return undefined;
-    }
+    setupCurrentDocument();
+    return Session.get("docid");
   },
   config:function(){
     return function(editor){
@@ -41,8 +36,8 @@ Template.editingUsers.helpers({
     users = new Array();
     var i =0;
     for (var user_id in eusers.users) {
-      console.log("adding a user");
-      console.log(eusers.users[user_id]);
+      //console.log("adding a user");
+      //console.log(eusers.users[user_id]);
       users[i] = eusers.users[user_id];
       //users[i] = fixObjectKeys(eusers.users[user_id]);
       i++;
@@ -54,6 +49,39 @@ Template.editingUsers.helpers({
 
 });
 
+Template.navbar.helpers({
+  documents:function(){
+    return Documents.find({});
+  }
+})
+Template.docMeta.helpers({
+  documents:function(){
+    return Documents.findOne({_id:Session.get("docid")});
+  }
+})
+//Events
+Template.navbar.events({
+  'click .js-add-doc':function(event){
+    event.preventDefault();
+    console.log("Add a new doc!");
+    if(!Meteor.user()) {//if user not available
+      alert("Please login to create a new document");
+    }
+    else {//they are logged in insert doc
+      var id = Meteor.call("addDoc", function(err, res){
+        if(!err) {//all good
+          console.log("event callback received: "+res);
+          Session.set("docid", res);
+        }
+      });
+    }
+  },
+  'click .js-go-doc':function(event){
+    Session.set("docid", this._id)
+  }
+
+})
+
 // this renames object keys by removing hyphens to make the compatible
 // with spacebars.
 function fixObjectKeys(obj){
@@ -63,4 +91,13 @@ function fixObjectKeys(obj){
     newObj[key2] = obj[key];
   }
   return newObj;
+}
+function setupCurrentDocument() {
+  var doc;
+  if(!Session.get("docid")) {//no doc id set
+      doc = Documents.findOne();
+      if(doc) {
+      Session.set("docid", doc._id);
+    }
+  }
 }
