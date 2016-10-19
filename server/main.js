@@ -13,7 +13,7 @@ Meteor.startup(() => {
 Meteor.publish("documents", function(){
 	return Documents.find({
 		$or:[
-		{isPrivate: false},
+		{isPrivate: {$ne:true}},
 		{owner:this.userId}
 		]
 	});
@@ -21,4 +21,8 @@ Meteor.publish("documents", function(){
 
 Meteor.publish("editingUsers", function(){
 	return EditingUsers.find({});
+})
+
+Meteor.publish("comments", function(){
+	return Comments.find({});
 })

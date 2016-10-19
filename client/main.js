@@ -3,7 +3,26 @@ import { Template } from 'meteor/templating';
 import './main.html';
 Meteor.subscribe("documents");
 Meteor.subscribe("editingUsers");
+Meteor.subscribe("comments");
 //Session.set('current_date', 8);
+Router.configure({
+  layoutTemplate: 'ApplicationLayout'
+});
+
+Router.route('/', function(){
+  console.log("you hit /");
+  this.render("navbar", {to:"header"});
+  this.render("docList", {to:"main"});
+});
+
+Router.route('/documents/:_id', function(){
+  console.log("you hit /documents"+ this.params._id);
+  Session.set("docid", this.params._id);
+  this.render("navbar", {to:"header"});
+  this.render("docItem", {to:"main"});
+});
+
+
 Accounts.ui.config({
   passwordSignupFields: "USERNAME_AND_EMAIL"
 
@@ -20,7 +39,7 @@ Template.editor.helpers({
       editor.on("change", function(cm_editor, info){
         console.log(cm_editor.getValue());
         $("#viewer_iframe").contents().find("html").html(cm_editor.getValue());
-        Meteor.call("addEditingUser");
+        Meteor.call("addEditingUser", Session.get("docid"));
       })
 
     }
@@ -30,7 +49,7 @@ Template.editor.helpers({
 Template.editingUsers.helpers({
   users:function(){
     var doc, eusers, users;
-    doc = Documents.findOne();
+    doc = Documents.findOne({_id:Session.get("docid")});
     if(!doc) {return;}//documents not exists
     eusers = EditingUsers.findOne({docid:doc._id});
     if(!eusers) {return;}//no entry in editingUsers
@@ -55,6 +74,13 @@ Template.navbar.helpers({
     return Documents.find();
   }
 })
+
+Template.docList.helpers({
+  documents:function(){
+    return Documents.find();
+  }
+})
+
 Template.docMeta.helpers({
   documents:function(){
     return Documents.findOne({_id:Session.get("docid")});
@@ -83,6 +109,22 @@ Template.editableText.helpers({
 
   }
 
+})
+
+Template.commentList.helpers({
+  comments:function(){
+    return Comments.find({docid:Session.get("docid")});
+  }
+
+})
+
+Template.insertCommentForm.helpers({
+  docid:function() {
+    return Session.get("docid");
+  },
+  owner:function(){
+    return Meteor.userId();
+  }
 })
 //Events
 Template.navbar.events({

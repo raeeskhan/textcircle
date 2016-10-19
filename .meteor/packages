@@ -24,3 +24,6 @@ twbs:bootstrap
 accounts-password
 accounts-ui
 babrahams:editable-text
+iron:router
+aldeed:autoform
+aldeed:collection2
